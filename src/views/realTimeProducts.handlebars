@@ -1,0 +1,27 @@
+<div>
+    <h1>Products</h1>
+    {{#if products}}
+        <div id="products">
+            {{#each products}}
+                <div>
+                    <p>ID: {{this.id}}</p>
+                    <p>Title: {{this.title}}</p>
+                    <p>Price: ${{this.price}}</p>
+                    <br>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <h2>No se encontraron productos</h2>
+    {{/if}}
+</div>
+<form>
+    <p>Agregar producto</p>
+    <input id="title" type="text" placeholder="Title">
+    <input id="price" type="number" placeholder="Price">
+    <button id="addBtn" type="submit">Enviar</button>
+</form>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>
