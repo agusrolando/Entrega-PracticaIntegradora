@@ -1,10 +1,9 @@
 <div>
     <h1>Products</h1>
-    {{#if products}}
         <div id="products">
+        {{#if products.length}}
             {{#each products}}
                 <div>
-                    <p>ID: {{this.id}}</p>
                     <p>Title: {{this.title}}</p>
                     <p>Price: ${{this.price}}</p>
                     <br>
@@ -15,10 +14,10 @@
         <h2>No se encontraron productos</h2>
     {{/if}}
 </div>
-<form>
+<form id="form">
     <p>Agregar producto</p>
-    <input id="title" type="text" placeholder="Title">
-    <input id="price" type="number" placeholder="Price">
+    <input id="title" name="title" type="text" placeholder="Title">
+    <input id="price" name="price" type="number" placeholder="Price">
     <button id="addBtn" type="submit">Enviar</button>
 </form>
 

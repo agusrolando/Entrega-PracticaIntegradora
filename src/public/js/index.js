@@ -1,29 +1,31 @@
 const socket = io()
-
 const prodTitle = document.getElementById('title')
 const prodPrice = document.getElementById('price')
-const addBtn = document.getElementById('addBtn')
+const form = document.getElementById('form')
 const productsDOM = document.getElementById('products')
 
-addBtn.addEventListener('click', (e) => {
+form.addEventListener('submit', (e) => {
     e.preventDefault()
-    const title = prodTitle.value.trim()
-    const price = prodPrice.value.trim()
-    if(title.length > 0 && price.length > 0 ) {
-        socket.emit('addProduct', {title,price})
+    const product = {
+        title : prodTitle.value,
+        price : prodPrice.value
     }
+    socket.emit('addProduct', product)
 })
 
-
-socket.on('showProducts', data => {
-    let products = ''
-    data.forEach(product => {
-        products += `<div>
-        <p>ID: ${product.id}</p>
+function productsList(products) {
+    return products.map(product => {
+        return( `<div>
         <p>Title: ${product.title}</p>
         <p>Price: $${product.price}</p>
         <br>
-    </div>`
+        </div>`)
     })
+}
+
+socket.on('showProducts', data => {
+    console.log(data)
+    const products = productsList(data)
     productsDOM.innerHTML = products
+   
 })

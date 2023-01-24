@@ -1,1 +1,1 @@
-[{"name":"Cervesa","price":140,"id":1},{"name":"Vino","price":150,"id":2}]
+[{"title":"Producto 1","price":"1","id":1},{"title":"Producto 2","price":"","id":2},{"title":"Producto 3","price":"3","id":3}]
