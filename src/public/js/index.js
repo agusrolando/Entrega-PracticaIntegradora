@@ -1,31 +1,28 @@
-const socket = io()
-const prodTitle = document.getElementById('title')
-const prodPrice = document.getElementById('price')
-const form = document.getElementById('form')
-const productsDOM = document.getElementById('products')
+const table = document.getElementById('productsTable')
 
-form.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const product = {
-        title : prodTitle.value,
-        price : prodPrice.value
-    }
-    socket.emit('addProduct', product)
-})
+const socket = io() 
 
-function productsList(products) {
-    return products.map(product => {
-        return( `<div>
-        <p>Title: ${product.title}</p>
-        <p>Price: $${product.price}</p>
-        <br>
-        </div>`)
-    })
-}
-
-socket.on('showProducts', data => {
-    console.log(data)
-    const products = productsList(data)
-    productsDOM.innerHTML = products
-   
-})
+socket.on('updatedProducts', data => {
+    table.innerHTML = 
+        `<tr>
+            <td><strong>Producto</strong></td>
+            <td><strong>Descripción</strong></td>
+            <td><strong>Precio</strong></td>
+            <td><strong>Código</strong></td>
+            <td><strong>Stock</strong></td>
+            <td><strong>Categoría</strong></td>
+        </tr>`;
+        for (product of data) {
+            let tr = document.createElement('tr')
+            tr.innerHTML=
+                        `   <td>${product.title}</td>
+                            <td>${product.description}</td>
+                            <td>${product.price}</td>
+                            <td>${product.code}</td>
+                            <td>${product.stock}</td>
+                            <td>${product.category}</td>
+                        `;
+            table.getElementsByTagName('tbody')[0].appendChild(tr);
+        }
+           
+} )
