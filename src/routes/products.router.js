@@ -5,6 +5,14 @@ const router = Router()
 
 router.get("/", async (req, res) => {
     const products = await productModel.find().lean().exec()
+    const limit = req.query.limit || 5
+
+    res.json(products.slice(0, parseInt(limit)))
+    
+})
+
+router.get("/realtimeproducts", async (req, res) => {
+    const products = await productModel.find().lean().exec()
     const limit = req.query.limit
     if (limit) {
         res.json(products.slice(0, parseInt(limit)))
@@ -15,19 +23,10 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.get("/realtimeproducts", async (req, res) => {
-    const products = await productModel.find().lean().exec()
-    res.render('realTimeProducts', {
-        data: products
-    })
-})
-
 router.get("/:id", async (req, res) => {
     const id = req.params.id
     const product = await productModel.findOne({_id: id})
-    res.json({
-        product
-    })
+    res.render("productDetail", product)
 })
 
 router.delete("/:pid", async (req, res) => {
