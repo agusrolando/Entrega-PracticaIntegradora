@@ -1,5 +1,5 @@
 import {Router} from "express"
-import productModel from "../dao/models/products.model.js"
+import productModel from "../dao/mongo/models/products.model.js"
 
 const router = Router()
 
@@ -28,9 +28,10 @@ router.get("/", async (req, res) => {
     }
     
     const data = await productModel.paginate(search, options)
-    console.log(JSON.stringify(data, null, 2, '\t'));
+    
+    const user = req.session.user
 
-    res.render('products', {data})
+    res.render('products', {data, user})
 })
 
 export default router

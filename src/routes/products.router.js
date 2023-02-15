@@ -1,17 +1,9 @@
 import {Router} from "express"
-import productModel from "../dao/models/products.model.js"
+import productModel from "../dao/mongo/models/products.model.js"
 
 const router = Router()
 
 router.get("/", async (req, res) => {
-    const products = await productModel.find().lean().exec()
-    const limit = req.query.limit || 5
-
-    res.json(products.slice(0, parseInt(limit)))
-    
-})
-
-router.get("/realtimeproducts", async (req, res) => {
     const products = await productModel.find().lean().exec()
     const limit = req.query.limit
     if (limit) {
@@ -21,6 +13,14 @@ router.get("/realtimeproducts", async (req, res) => {
             products
         })
     }
+})
+
+
+router.get("/realtimeproducts", async (req, res) => {
+    const products = await productModel.find().lean().exec()
+    res.render('realTimeProducts', {
+        data: products
+    })
 })
 
 router.get("/:id", async (req, res) => {
