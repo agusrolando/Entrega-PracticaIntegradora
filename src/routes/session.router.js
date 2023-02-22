@@ -24,15 +24,30 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body
 
-    const user = await UserModel.findOne({email, password}).lean().exec()
-    if(!user) {
-        return res.status(401).render('errors/base', {
-            error: 'Error en email y/o password'
-        })
-    }
+    if(email === 'adminCoder@coder.com' && password === 'adminCod3r123') {
+        const admin = {
+            email,
+            password,
+            first_name: 'Admin',
+            last_name: 'Coder',
+            age: 2,
+            role: 'admin'
+        }
+        req.session.user = admin
+        res.json({status: 'success', payload: admin})
+    } else {
+        const user = await UserModel.findOne({email, password}).lean().exec()
+        if(!user) {
+            return res.status(401).render('errors/base', {
+                error: 'Error en email y/o password'
+            })
+        }
+    
+        req.session.user = user
+        res.redirect('/products')
 
-    req.session.user = user
-    res.redirect('/products')
+        }
+
 })
 
 
