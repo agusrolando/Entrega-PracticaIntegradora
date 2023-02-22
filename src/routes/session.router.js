@@ -4,7 +4,7 @@ import UserModel from "../dao/mongo/models/user.model.js";
 const router = Router()
 
 router.get('/register', (req, res) => {
-    res.render('sessions/register')
+    res.render('session/register')
 })
 
 router.post('/register', async(req, res) => {
@@ -41,7 +41,7 @@ router.get('/logout', (req, res) => {
         if(err) {
             console.log(err);
             res.status(500).render('errors/base', {error: err})
-        } else res.redirect('/sessions/login')
+        } else res.redirect('/session/login')
     })
 })
 
