@@ -1,5 +1,7 @@
 <h1>Iniciar Session</h1>
 
+<hr>
+
 <form action="/session/login" method="post">
     Email: <input type="text" name="email"><br>
     Password: <input type="password" name="password"><br>
@@ -9,7 +11,17 @@
 
     <input type="submit" value="Iniciar Sesion">
 </form>
-  
+
+<hr>
+
 <div>
+<h2>Si no estas registrado entra aqui</h2>
+<a href="/session/register"><button>Registrarse</button></a>
+</div>
+
+<hr>
+
+<div>
+    <h3>Tambien podes ingresar con GitHub</h3>
     <a href="/session/github"><button>Entrar con Github</button></a>
 </div>
