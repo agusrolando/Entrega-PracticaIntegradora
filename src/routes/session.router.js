@@ -1,7 +1,17 @@
 import { Router } from "express";
 import UserModel from "../dao/mongo/models/user.model.js";
+import passport from "passport";
 
 const router = Router()
+
+router.post('/register', passport.authenticate('register', { failureRedirect: '/session/failregister' }), async (req, res) => {
+    res.redirect('/session/login')
+})
+router.get('/failregister', (req, res) => {
+    console.log('Fail Strategy');
+    res.send({ error: "Failed" })
+})
+
 
 router.get('/register', (req, res) => {
     res.render('session/register')
@@ -21,33 +31,23 @@ router.get('/login', (req, res) => {
     res.render('session/login')
 })
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body
+router.post('/login', passport.authenticate('login', {failureRedirect: '/faillogin'}), async (req, res) => {
+    const user = req.user
+    if(!user) return res.status(400).json({status: 'error', error: 'Invalid credentials'})
 
-    if(email === 'adminCoder@coder.com' && password === 'adminCod3r123') {
-        const admin = {
-            email,
-            password,
-            first_name: 'Admin',
-            last_name: 'Coder',
-            age: 2,
-            role: 'admin'
-        }
-        req.session.user = admin
-        res.json({status: 'success', payload: admin})
-    } else {
-        const user = await UserModel.findOne({email, password}).lean().exec()
-        if(!user) {
-            return res.status(401).render('errors/base', {
-                error: 'Error en email y/o password'
-            })
-        }
-    
-        req.session.user = user
-        res.redirect('/products')
+    req.session.user = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        age: user.age,
+        email: user.email,
+        role: user.role
+    }
+   
+    res.redirect('/products')
+})
 
-        }
-
+router.get('/faillogin', (req, res) => {
+    res.json({status: 'error', error: 'Failed login'})
 })
 
 
@@ -59,6 +59,24 @@ router.get('/logout', (req, res) => {
         } else res.redirect('/session/login')
     })
 })
+
+router.get(
+    '/github',
+    passport.authenticate('github', {scope: ['user:email']}),
+    async(req, res) => {}
+)
+
+router.get(
+    '/githubcallback',
+    passport.authenticate('github', {failureRedirect: '/login'}),
+    async(req, res) => {
+        console.log("Callback: ", req.user);
+
+        req.session.user = req.user
+        console.log("User Session: ", req.session.user);
+        res.redirect('/')
+    }
+)
 
 
 

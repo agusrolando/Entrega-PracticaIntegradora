@@ -9,9 +9,9 @@
 <body>
     <div>
         <h2>Bienvenido</h2>
-        <p {{user.first_name}}</p>
+        <p> {{user.first_name}}</p>
         <form action="/session/logout" method="get">
-        <input class="btn btn-danger" type="submit" value="Logout">
+        <input type="submit" value="Logout">
         </form>
     </div>
     {{{ body }}}

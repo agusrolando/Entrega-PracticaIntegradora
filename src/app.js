@@ -6,6 +6,9 @@ import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import run from "./run.js";
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
+
 
 const app = express()
 
@@ -28,6 +31,11 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 mongoose.connect(MongoUri, {
     dbName: MongoDbName,
