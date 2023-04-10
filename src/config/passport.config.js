@@ -36,7 +36,6 @@ const initializePassport = () => {
                 role: 'user'
             }
             const result = await UserModel.create(newUser)
-            console.log(newUser)
             
             return done(null, result)
         } catch (error) {

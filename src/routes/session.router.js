@@ -7,7 +7,7 @@ import { authorization, passportCall } from "../utils.js";
 const router = Router()
 
 router.get('/current', passportCall('jwt'), authorization('user'), (req, res)=>{
-    console.log('get: ',req.user);
+   
     res.render('session/profile', {
         user: req.user.user
     })

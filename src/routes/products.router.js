@@ -1,82 +1,25 @@
 import {Router} from "express"
-import productModel from "../dao/mongo/models/products.model.js"
+import { getAll, getAllRL, getById, deleteOne, create, updateOne } from "../controler/product.controler.js"
 
 const router = Router()
 
-router.get("/", async (req, res) => {
-    const products = await productModel.find().lean().exec()
-    const limit = req.query.limit
-    if (limit) {
-        res.json(products.slice(0, parseInt(limit)))
-    } else {
-        res.render("home", {
-            products
-        })
-    }
-})
+//GET
+router.get("/", getAll)
 
+//GET REALTIME
+router.get("/realtimeproducts", getAllRL)
 
-router.get("/realtimeproducts", async (req, res) => {
-    const products = await productModel.find().lean().exec()
-    res.render('realTimeProducts', {
-        data: products
-    })
-})
+//GET BY ID
+router.get("/:id", getById)
 
-router.get("/:id", async (req, res) => {
-    const id = req.params.id
-    const product = await productModel.findOne({_id: id})
-    res.render("productDetail", product)
-})
+//DELETE
+router.delete("/:pid", deleteOne)
 
-router.delete("/:pid", async (req, res) => {
-    const id = req.params.pid
-    const productDeleted = await productModel.deleteOne({_id: id})
+//POST
+router.post("/", create)
 
-    req.io.emit('updatedProducts', await productModel.find().lean().exec());
-    res.json({
-        status: "Success",
-        massage: "Product Deleted!",
-        productDeleted
-    })
-})
-
-router.post("/", async (req, res) => {
-    try {
-        const product = req.body
-        if (!product.title) {
-            return res.status(400).json({
-                message: "Error Falta el nombre del producto"
-            })
-        }
-        const productAdded = await productModel.create(product)
-        req.io.emit('updatedProducts', await productModel.find().lean().exec());
-        res.json({
-            status: "Success",
-            productAdded
-        })
-    } catch (error) {
-        console.log(error)
-        res.json({
-            error
-        })
-    }
-})
-
-router.put("/:pid", async (req, res) => {
-    const id = req.params.pid
-    const productToUpdate = req.body
-
-    const product = await productModel.updateOne({
-        _id: id
-    }, productToUpdate)
-    req.io.emit('updatedProducts', await productModel.find().lean().exec());
-    res.json({
-        status: "Success",
-        product
-    })
-})
-
+//PUT
+router.put("/:pid", updateOne)
 
 export default router
 
