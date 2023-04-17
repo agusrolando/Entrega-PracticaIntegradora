@@ -1,18 +1,23 @@
 import { Router } from "express";
-import UserModel from "../dao/mongo/models/user.model.js";
 import passport from "passport";
-import { jwtCookieName } from "../config/credentials.js";
+import config from "../config/config.js";
 import { authorization, passportCall } from "../utils.js";
 
 const router = Router()
 
+//Profile
 router.get('/current', passportCall('jwt'), authorization('user'), (req, res)=>{
-   
-    res.render('session/profile', {
+    res.render('sessions/profile', {
         user: req.user.user
     })
 })
 
+//Vista para registrar usuarios
+router.get('/register', (req, res) => {
+    res.render('sessions/register')
+})
+
+// API para crear usuarios en la DB
 router.post('/register', passport.authenticate('register', { failureRedirect: '/session/failregister' }), async (req, res) => {
     res.redirect('/session/login')
 })
@@ -21,41 +26,33 @@ router.get('/failregister', (req, res) => {
     res.send({ error: "Failed" })
 })
 
-
-router.get('/register', (req, res) => {
-    res.render('session/register')
-})
-
-router.post('/register', async(req, res) => {
-    const userNew = req.body
-    console.log(userNew);
-
-    const user = new UserModel(userNew)
-    await user.save()
-
-    res.redirect('/session/login')
-})
-
+// Vista de Login
 router.get('/login', (req, res) => {
-    res.render('session/login')
+    res.render('sessions/login', {style: "/css/login.css"})
 })
 
-router.post('/login', passport.authenticate('login', {failureRedirect: '/faillogin'}), async (req, res) => {
-    const user = req.user
-    if(!user) return res.status(400).json({status: 'error', error: 'Invalid credentials'})
-
-    res.cookie(jwtCookieName, req.user.token).redirect('/products')
+// API para login
+router.post('/login', passport.authenticate('login', { failureRedirect: '/session/faillogin' }), async (req, res) => {
+    if (!req.user) {
+        return res.status(400).send({ status: "error", error: "Invalid credentiales" })
+    }
+    res.cookie(config.jwtCookieName, req.user.token).redirect('/products')
+    
 })
-
 router.get('/faillogin', (req, res) => {
-    res.json({status: 'error', error: 'Failed login'})
+    res.send({error: "Fail Login"})
 })
 
+router.get('/profile', (req, res) => {
+    res.json(req.session.user)
+})
 
+// Cerrar Session
 router.get('/logout', (req, res) => {
-    res.clearCookie(jwtCookieName).redirect('/session/login');
+    res.clearCookie(config.jwtCookieName).redirect('/session/login');
 })
 
+//Para iniciar con GitHub
 router.get(
     '/github',
     passport.authenticate('github', {scope: ['user:email']}),
@@ -64,13 +61,11 @@ router.get(
 
 router.get(
     '/githubcallback',
-    passport.authenticate('github', {failureRedirect: '/login'}),
+    passport.authenticate('github', {failureRedirect: '/session/login'}),
     async(req, res) => {
-        console.log("Callback: ", req.user);
 
         req.session.user = req.user
-        console.log("User Session: ", req.session.user);
-        res.redirect('/')
+        res.redirect('/products')
     }
 )
 
