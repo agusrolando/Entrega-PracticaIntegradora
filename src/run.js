@@ -5,6 +5,8 @@ import { MessageService } from "./repository/index.js"
 import productViewsRouter from './routes/products.views.router.js'
 import sessionRouter from './routes/session.router.js'
 import { passportCall } from "./utils.js";
+import errorMiddlewares from "./errors/errorMiddlewares.js"
+import mocksRouter from "./routes/mocks.router.js"
 
 const run = (socketServer, app) => {
     app.use((req, res, next) => {
@@ -18,6 +20,7 @@ const run = (socketServer, app) => {
     app.use("/api/products", productRouter)
     app.use("/api/carts", cartRouter)
     app.use("/api/chat", chatRouter)
+    app.use("/api/mockingProducts", mocksRouter)
 
     const messages = []
 
@@ -31,7 +34,7 @@ const run = (socketServer, app) => {
     })
 
     app.use("/", (req, res) => res.send("HOME"))
-
+    app.use(errorMiddlewares)
 
 }
 

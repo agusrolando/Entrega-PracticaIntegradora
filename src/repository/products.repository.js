@@ -29,4 +29,14 @@ export default class ProductRepository {
     update = async (id, productToUpdate) => {
         return await this.dao.update(id, productToUpdate)
     }
+
+    //FAKER
+    getMock = async () => {
+        return await this.dao.find().lean().exec()
+    }
+
+    createMock = async(data) => {
+        return await this.dao.create(data)
+    }
 }
+
