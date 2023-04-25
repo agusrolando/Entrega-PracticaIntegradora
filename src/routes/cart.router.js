@@ -1,9 +1,12 @@
 import { Router } from "express"
-import { CartService } from "../repository/index.js"
+import TicketModel from "../dao/mongo/models/ticket.model.js"
+import { CartService, ProductService } from "../repository/index.js"
+import { authorization, passportCall } from "../utils.js"
+import { v4 as uuidv4 } from 'uuid';
 
 const router = Router()
 
-//GET
+//GET 
 router.get("/", async (req, res) => {
     const carts = await CartService.get()
     res.json({ carts })
@@ -16,14 +19,14 @@ router.get("/:id", async (req, res) => {
     res.render("cart", {productsInCart})
 })
 
-//POST
-router.post("/", async (req, res) => {
+//POST user
+router.post("/", authorization('user'), async (req, res) => {
     const newCart = await CartService.create({})
 
     res.json({status: "Success", newCart})
 })
 
-router.post("/:cid/product/:pid", async (req, res) => {
+router.post("/:cid/product/:pid", authorization('user'), async (req, res) => {
     const cartID = req.params.cid
     const productID = req.params.pid
     const quantity= req.body.quantity || 1
@@ -48,12 +51,39 @@ router.post("/:cid/product/:pid", async (req, res) => {
     res.redirect(`/api/carts/${cartID}`)
 })
 
-router.post("/:cid/purchase", async (req, res) => {
+router.post("/:cid/purchase", passportCall('jwt'), authorization('user'), async (req, res) => {
     const cartID = req.params.cid
+    const cart = await CartService.getById(cartID)
+    let totalPrice = 0
+    const noStock = []
+    const comparation = cart.products
+    await Promise.all(comparation.map( async p => {
+        if(p.id.stock >= p.quantity){
+            p.id.stock -= p.quantity;
+            ProductService.update(p.id._id, p.id);
+            totalPrice += p.id.price * p.quantity;
+            const productIDX = comparation.findIndex(item => item.id._id == p.id._id)
+            comparation.splice(productIDX, 1)
+            await cart.save()
+        } else {
+            noStock.push({
+                title: p.id.title,
+                price: p.id.price,
+                quantity: p.quantity
+            })
+        }
+    }))
+     if(totalPrice > 0)
+      await TicketModel.create({
+          purchaser : req.user.user.email,
+          amount : totalPrice,
+          code: uuidv4()
+      })
+    res.json({status: "Success"})
 })
 
-//DELETE
-router.delete("/:cid/product/:pid", async (req, res) => {
+//DELETE admin
+router.delete("/:cid/product/:pid", authorization('admin'), async (req, res) => {
     const cartID = req.params.cid
     const productID = req.params.pid
 
@@ -70,7 +100,7 @@ router.delete("/:cid/product/:pid", async (req, res) => {
     res.json({status: "Success", cart})
 })
 
-router.delete("/:cid", async (req, res) => {
+router.delete("/:cid", authorization('admin'), async (req, res) => {
     const cartID = req.params.cid
     const cart = await CartService.getById(cartID)
     if(!cart) return res.status(404).json({status: "error", error: "Cart Not Found"})
@@ -81,8 +111,8 @@ router.delete("/:cid", async (req, res) => {
     res.json({status: "Success", cart})
 })
 
-//PUT
-router.put("/:cid/product/:pid", async (req, res) => {
+//PUT admin
+router.put("/:cid/product/:pid", authorization('admin'), async (req, res) => {
     const cartID = req.params.cid
     const productID = req.params.pid
     const newQuantity = req.body.quantity
@@ -98,7 +128,7 @@ router.put("/:cid/product/:pid", async (req, res) => {
     res.json({status: "Success", cart})
 })
 
-router.put("/:cid", async (req, res) => {
+router.put("/:cid", authorization('admin'), async (req, res) => {
     const cartID = req.params.cid
     const cartUpdate = req.body
 

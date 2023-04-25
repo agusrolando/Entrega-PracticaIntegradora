@@ -1,15 +1,16 @@
 import { Router } from "express";
 import passport from "passport";
 import config from "../config/config.js";
+import { UserService } from "../repository/index.js";
 import { authorization, passportCall } from "../utils.js";
 
 const router = Router()
 
 //Profile
-router.get('/current', passportCall('jwt'), authorization('user'), (req, res)=>{
-    res.render('sessions/profile', {
-        user: req.user.user
-    })
+router.get('/current', passportCall('jwt'), authorization('user'), async (req, res)=>{
+    const id = req.user.user._id
+    const user = await UserService.getOneByID(id)
+    res.render('sessions/profile', {user: user})
 })
 
 //Vista para registrar usuarios
