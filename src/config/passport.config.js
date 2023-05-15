@@ -21,7 +21,7 @@ const initializePassport = () => {
         try {
             const user = await UserService.getOneByEmail(username)
             if(user) {
-                console.log("User already exits");
+                req.logger.info("User already exits");
                 return done(null, false)
             }
     
@@ -34,9 +34,13 @@ const initializePassport = () => {
                 cart: await CartService.create({}),
                 role: 'user'
             }
-            const result = await UserService.create(newUser)
-            
-            return done(null, result)
+
+            if(!first_name || !last_name || !email || !age){
+                req.logger.error("Faltan Datos")
+            }else{
+                const result = await UserService.create(newUser)
+                return done(null, result)
+            }
         } catch (error) {
             return done("[LOCAL] Error al obtener user " + error)
         }

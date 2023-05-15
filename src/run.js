@@ -7,6 +7,7 @@ import sessionRouter from './routes/session.router.js'
 import { passportCall } from "./utils.js";
 import errorMiddlewares from "./errors/errorMiddlewares.js"
 import mocksRouter from "./routes/mocks.router.js"
+import loggerTest from "./routes/loggerTest.js"
 
 const run = (socketServer, app) => {
     app.use((req, res, next) => {
@@ -14,13 +15,13 @@ const run = (socketServer, app) => {
         next()
     })
 
-
     app.use("/products", passportCall("jwt"), productViewsRouter)
     app.use("/session", sessionRouter)
     app.use("/api/products", productRouter)
     app.use("/api/carts", cartRouter)
     app.use("/api/chat", chatRouter)
     app.use("/api/mockingProducts", mocksRouter)
+    app.use("/loggerTest", loggerTest)
 
     const messages = []
 
