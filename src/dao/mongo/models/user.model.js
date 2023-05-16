@@ -8,7 +8,11 @@ const userSchema = new mongoose.Schema({
     email: String,
     age: Number,
     password: String,
-    role: { type: String, default: 'user' },
+    role: {
+        type: String,
+        enum: ["user", "premium", "admin"],
+        default: "user",
+      },
     cart: {
         _id: {
             type: mongoose.Schema.Types.ObjectId,

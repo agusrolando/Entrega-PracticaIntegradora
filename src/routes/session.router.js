@@ -2,9 +2,22 @@ import { Router } from "express";
 import passport from "passport";
 import config from "../config/config.js";
 import { UserService } from "../repository/index.js";
-import { authorization, passportCall } from "../utils.js";
+import { authorization, passportCall} from "../utils.js";
+import { changePassword, sendRecoveryMail } from "../controllers/session.controlers.js";
 
 const router = Router()
+
+router.post("/forgotPassword", sendRecoveryMail);
+
+router.get('/forgotPassword', (req, res) => {
+    res.render('sessions/forgotPassword')
+})
+
+router.put("/forgotPassword/:uid/:token", changePassword);
+
+router.get('/forgotPassword/:uid/:token', (req, res) => {
+    res.render('sessions/changePassword')
+})
 
 //Profile
 router.get('/current', passportCall('jwt'), authorization('user'), async (req, res)=>{
