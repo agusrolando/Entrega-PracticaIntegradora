@@ -13,10 +13,12 @@ router.get('/forgotPassword', (req, res) => {
     res.render('sessions/forgotPassword')
 })
 
-router.put("/forgotPassword/:uid/:token", changePassword);
+router.post("/forgotPassword/:uid/:token", changePassword);
 
 router.get('/forgotPassword/:uid/:token', (req, res) => {
-    res.render('sessions/changePassword')
+    const uid = req.params.uid
+    const token = req.params.token
+    res.render('sessions/changePassword', {uid: uid, token: token})
 })
 
 //Profile

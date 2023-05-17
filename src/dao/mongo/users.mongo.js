@@ -47,4 +47,20 @@ export default class User {
     getOneByEmail = async(email) => {
         return await UserModel.findOne({ email }).lean().exec()
     }
+
+    update = async (id, data) => {
+        return await UserModel.updateOne({
+            _id: id
+        }, data)
+    }
+
+    updatePass = async (id, password) => {
+        return await UserModel.updateOne({
+            _id: id
+        }, {
+            $set: {
+                password: password
+            }
+        })
+    }
 }

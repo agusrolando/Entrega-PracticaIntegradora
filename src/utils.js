@@ -16,9 +16,12 @@ export const isValidPassword = (user, password) => {
 
 //JWT
 
-export const generateToken = user => {
-    const token = jwt.sign({user}, config.jwtPrivateKey, {expiresIn: "24h"})
-    return token
+export const generateToken = (user, time) => {
+    const token = jwt.sign({
+        user
+    }, config.jwtPrivateKey, {
+        expiresIn: time
+    })
 }
 
 export const validateToken = (token) => {
@@ -33,13 +36,15 @@ export const extractCookie = req => {
 
 export const passportCall = (strategy) =>  {
     return async (req, res, next) => {
-        passport.authenticate(strategy, function(err, user, info){
-            if(err) return next(err)
-            if(!user) return res.status(401).render("errors/base", {error: info.messages ? info.messages : info.toString()}), req.logger.error('User No Logeado')
+        passport.authenticate(strategy, function (err, user, info) {
+            if (err) return next(err)
+            if (!user) return res.status(401).render("errors/base", {
+                error: info.messages ? info.messages : info.toString()
+            }), req.logger.error('User No Logeado')
             
             req.user = user
             next()
-        }) (req, res, next)
+        })(req, res, next)
     }
 }
 
@@ -52,6 +57,26 @@ export const authorization = (role) => {
     }
 }
 
+export const validateTokenAndGetID = (req, res, next) => {
+    const token = req.params.jwt;
+    jwt.verify(token, config.private_key, (error, credentials) => {
+        if (error) return res.render('session/restore', {
+            message: "token expired"
+        })
+        req.id = credentials.user;
+        next();
+    })
+}
 
+export const passwordFormatIsValid = (password) => {
+    const message = {};
+    if (password.length < 8) message.large = "Debe tener como minimo 8 caracteres.";
+    if (!(/[A-Z]/.test(password))) message.mayus = "Debe contener al menos una mayuscula.";
+    if (!(/[0-9]/.test(password))) message.number = "Debe contener algun numero.";
+
+    return message;
+
+
+}
 
 export default __dirname

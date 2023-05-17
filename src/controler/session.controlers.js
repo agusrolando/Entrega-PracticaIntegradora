@@ -5,6 +5,7 @@ import { validateToken, isValidPassword as comparePasswords, createHash } from "
 export const changePassword = async (req, res) => {
     try { 
       const { uid, token } = req.params
+      console.log(req.params)
       const { newPassword, confirmation } = req.body
       const { err } = validateToken(token)
       const user = await UserService.getOneByID(uid)
@@ -16,12 +17,10 @@ export const changePassword = async (req, res) => {
       if(comparePasswords(user, newPassword)) return res.json({status: "error", error: "La contraseña no puede ser igual a la anterior."})
       if(newPassword != confirmation) return res.json({status: "error", error: "Las contraseñas no coinciden."})
 
-      const userData = {
-        ...user,
-        password: createHash(newPassword)
-      }
+      const hashedPassword = createHash(newPassword)
 
-      const newUser = await UserService.updateUser(uid, userData)
+      const newUser = await UserService.updateUser(uid, hashedPassword)
+     
       res.json({status: "success", payload: newUser})
     } catch(error) {
         req.logger.warning("Fail Login")

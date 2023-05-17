@@ -29,10 +29,9 @@ export default class UserRepository {
         return await this.dao.create(dataToInsert)
     }
 
-    updateUser = async (id, data) => {
-        await this.dao.update(id, data)
-        return await this.getUserDataByID(id)
-      }
+    updateUser = async (id, password) => {
+        return await this.dao.updatePass(id, password)
+    }
 
     sendMail = async (email) => {
         const user = await this.getOneByEmail(email)
@@ -45,7 +44,7 @@ export default class UserRepository {
             })
         }
 
-        const token = generateToken({},  1)
+        const token = generateToken(user._id, "1h")
 
         const html = `
         <p>Ingresa al link para cambio de contraseña</p>
