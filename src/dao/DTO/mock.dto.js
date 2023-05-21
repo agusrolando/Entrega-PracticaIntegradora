@@ -1,16 +1,13 @@
-faker.locale= 'es';
-export const generateProduct = () => {
+export default class MockDTO {
 
-    return{
-        _id: faker.database.mongodbObjectId(),
-        title: faker.commerce.productName(),
-        description: faker.commerce.productDescription(),
-        price: faker.commerce.price(),
-        thumbnails: [faker.image.imageUrl()],
-        code: faker.random.numeric(5),
-        stock: faker.random.numeric(2),
-        category: faker.commerce.department(),
-        status: faker.datatype.boolean()
-
+    constructor(product) {
+        this.title = product.title || ""
+        this.description = product.description || ""
+        this.price = product.price || 0
+        this.status = product.status || true
+        this.stock = product.stock || 0
+        this.category = product.category || ""
+        this.thumbnails = product.thumbnails || ""
     }
+
 }
